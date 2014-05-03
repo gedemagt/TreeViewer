@@ -64,7 +64,6 @@ public class MenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				saveAs();
-
 			}
 		});
 		menu_save.addActionListener(new ActionListener() {
