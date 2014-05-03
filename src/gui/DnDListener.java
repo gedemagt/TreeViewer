@@ -82,6 +82,7 @@ public class DnDListener extends MouseAdapter {
 		if(e == null) return false;
 		if(e == current) return false;
 		if(isEntryInSubTree(current, e)) return false;
+		if(e.equals(b.getTree().getParent(current))) return false;
 		return true;
 	}
 	
