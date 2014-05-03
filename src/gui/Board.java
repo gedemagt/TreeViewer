@@ -6,20 +6,16 @@ import java.awt.event.MouseAdapter;
 
 import javax.swing.JPanel;
 
-import org.abego.treelayout.TreeLayout;
-
 import main.common.Entry;
-import main.tree.MyTree;
+import main.tree.TreeStructure;
 
 public interface Board {
 
 	public Entry getEntryAt(int x, int y);
 	
-	public void setTree(MyTree tree);
+	public void setTree(TreeStructure<Entry> tree);
 	
-	public MyTree getTree();
-	
-	public TreeLayout<Entry> getTreeLayout();
+	public TreeStructure<Entry> getTree();
 	
 	public void updateTree();
 	

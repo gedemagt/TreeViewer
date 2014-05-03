@@ -16,8 +16,9 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import main.common.Constants;
+import main.common.Entry;
 import main.common.SaveLoad;
-import main.tree.MyTree;
+import main.tree.TreeStructure;
 import main.undo.UndoRedoManager;
 
 @SuppressWarnings("serial")
@@ -98,7 +99,7 @@ public class MenuBar extends JMenuBar {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
 			try {
-				MyTree tree = sl.load(file);
+				TreeStructure<Entry> tree = sl.load(file);
 				panel.setTree(tree);
 				panel.repaint();
 				panel.revalidate();

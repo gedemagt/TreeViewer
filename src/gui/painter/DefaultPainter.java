@@ -1,6 +1,6 @@
 package gui.painter;
 
-import gui.Board;
+import gui.abego.AbegoBoard;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -22,10 +22,10 @@ public class DefaultPainter implements Painter{
 	private final static Color HIGHLIGHTED_BORDER_COLOR = Color.GREEN;
 	private final static Color TEXT_COLOR = Color.black;
 
-	private Board b;
+	private AbegoBoard b;
 	private List<Entry> highlights;
 	
-	public DefaultPainter(Board b) {
+	public DefaultPainter(AbegoBoard b) {
 		this.b = b;
 		highlights = new ArrayList<Entry>();
 	}

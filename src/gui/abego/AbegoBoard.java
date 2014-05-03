@@ -26,22 +26,22 @@ import javax.swing.JTextField;
 import javax.swing.OverlayLayout;
 
 import org.abego.treelayout.TreeLayout;
+import org.abego.treelayout.util.DefaultConfiguration;
 
 import main.common.Entry;
-import main.tree.MyTree;
+import main.tree.GauravTree;
+import main.tree.TreeStructure;
 import main.undo.TreeActions;
 import main.undo.UndoRedoManager;
+import main.tree.AbegoTree;
 
 @SuppressWarnings("serial")
 public class AbegoBoard extends JLayeredPane implements Board{
 
 	private TreeLayout<Entry> treeLayout;
-	private MyTree tree;
+	private TreeStructure<Entry> tree;
+	private AbegoTree abegoTree;
 	private JPanel glassPane;
-
-	public MyTree getTree() {
-		return tree;
-	}
 
 	private Iterable<Entry> getChildren(Entry parent) {
 		return tree.getChildren(parent);
@@ -53,8 +53,14 @@ public class AbegoBoard extends JLayeredPane implements Board{
 	 * 
 	 * @param treeLayout
 	 */
-	public AbegoBoard(MyTree tree, TreeLayout<Entry> treeLayout) {
+	public AbegoBoard(GauravTree tree) {
 		this.tree = tree;
+		abegoTree = new AbegoTree(tree);
+		DefaultConfiguration<Entry> config = new DefaultConfiguration<Entry>(100,30);
+		EntryNodeExtentProvider nodeExtentProvider = new EntryNodeExtentProvider();
+		treeLayout = new TreeLayout<Entry>(abegoTree, nodeExtentProvider, config);
+
+
 		setLayout(new OverlayLayout(this));
 		setOpaque(false);
 		glassPane = new JPanel();
@@ -62,7 +68,7 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		add(glassPane,Integer.valueOf(1));
 
 		((EntryNodeExtentProvider) treeLayout.getNodeExtentProvider()).setFontMetric(getFontMetrics(glassPane.getFont()));
-		this.treeLayout = treeLayout;
+
 		p = new DefaultPainter(this);
 
 		Dimension size = treeLayout.getBounds().getBounds().getSize();
@@ -70,11 +76,11 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		registerPopupMenu();
 
 		UndoRedoManager.registerListener(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				updateTree();
-				
+
 			}
 		});
 	}
@@ -106,14 +112,16 @@ public class AbegoBoard extends JLayeredPane implements Board{
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-		paintEdges(g, getTree().getRoot());
-		paintBox(g, getTree().getRoot());
+		paintEdges(g, getTree().root());
+		paintBox(g, getTree().root());
 
 	}
 
-	public void setTree(MyTree tree) {
+	@Override
+	public void setTree(TreeStructure<Entry> tree) {
 		this.tree = tree;
-		treeLayout = new TreeLayout<Entry>(tree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+		abegoTree.setTree(tree);
+		treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 		setPreferredSize(new Dimension((int) treeLayout.getBounds().getWidth(), (int) treeLayout.getBounds().getHeight()));
 	}
 
@@ -135,7 +143,7 @@ public class AbegoBoard extends JLayeredPane implements Board{
 				if(i == JOptionPane.OK_OPTION) {
 					//					((DefaultTreeForTreeLayout<Entry>) getTree()).addChild(e, new_e);
 					UndoRedoManager.addEdit(TreeActions.add(AbegoBoard.this, e, new_e));
-					treeLayout = new TreeLayout<Entry>(getTree(), treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+					treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 
 
 					setPreferredSize(new Dimension((int) treeLayout.getBounds().getWidth(), (int) treeLayout.getBounds().getHeight()));
@@ -167,8 +175,8 @@ public class AbegoBoard extends JLayeredPane implements Board{
 				Entry e = getEntry(popup_x, popup_y);
 				if(e == null) return;
 				UndoRedoManager.addEdit(TreeActions.delete(AbegoBoard.this, e));
-				
-				treeLayout = new TreeLayout<Entry>(getTree(), treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+
+				treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 
 				repaint();
 			}
@@ -201,27 +209,27 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		});
 		popup.add(collapse);
 
-//		JMenuItem undo = new JMenuItem("Undo");
-//		undo.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				UndoRedoManager.undo();
-//				updateTree();
-//			}
-//		});
-//		popup.add(undo);
-//
-//		JMenuItem redo = new JMenuItem("Redo");
-//		redo.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				UndoRedoManager.redo();
-//				updateTree();
-//			}
-//		});
-//		popup.add(redo);
+		//		JMenuItem undo = new JMenuItem("Undo");
+		//		undo.addActionListener(new ActionListener() {
+		//
+		//			@Override
+		//			public void actionPerformed(ActionEvent arg0) {
+		//				UndoRedoManager.undo();
+		//				updateTree();
+		//			}
+		//		});
+		//		popup.add(undo);
+		//
+		//		JMenuItem redo = new JMenuItem("Redo");
+		//		redo.addActionListener(new ActionListener() {
+		//
+		//			@Override
+		//			public void actionPerformed(ActionEvent arg0) {
+		//				UndoRedoManager.redo();
+		//				updateTree();
+		//			}
+		//		});
+		//		popup.add(redo);
 		setComponentPopupMenu(popup);
 		addMouseListener(new MouseListener() {
 
@@ -238,7 +246,7 @@ public class AbegoBoard extends JLayeredPane implements Board{
 					Entry entry = getEntry(e.getX(), e.getY());
 					if(entry == null) return;
 					entry.setShowDetails(!entry.isShowDetails());
-					treeLayout = new TreeLayout<Entry>(getTree(), treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+					treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 					repaint();
 				}
 
@@ -313,7 +321,7 @@ public class AbegoBoard extends JLayeredPane implements Board{
 
 	@Override
 	public void updateTree() {
-		treeLayout = new TreeLayout<Entry>(getTree(), treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+		treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 		setPreferredSize(new Dimension((int) treeLayout.getBounds().getWidth(), (int) treeLayout.getBounds().getHeight()));
 		revalidate();
 		repaint();
@@ -332,7 +340,6 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		return p;
 	}
 
-	@Override
 	public TreeLayout<Entry> getTreeLayout() {
 		return treeLayout;
 	}
@@ -343,6 +350,11 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		glassPane = jp;
 		add(jp,1);
 
+	}
+
+	@Override
+	public TreeStructure<Entry> getTree() {
+		return tree;
 	}
 
 

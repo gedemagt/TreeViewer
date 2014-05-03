@@ -5,6 +5,7 @@ import gui.Board;
 import javax.swing.undo.UndoableEdit;
 
 import main.common.Entry;
+import main.tree.TreeStructure;
 
 import com.gaurav.tree.Tree;
 
@@ -27,16 +28,16 @@ public class TreeActions {
 	
 	public static UndoableEdit delete(Board b, Entry e) {
 		Entry parent = b.getTree().getParent(e);
-		Tree<Entry> subtree = b.getTree().getSubTree(e);
-		b.getTree().removeElement(e);
+		TreeStructure<Entry> subtree = b.getTree().getSubTree(e);
+		b.getTree().remove(e);
 		
 		return new DeleteRedoAction(b, subtree, parent);
 	}
 	
 	public static UndoableEdit move(Board b, Entry from, Entry to) {
 		Entry parent = b.getTree().getParent(from);
-		Tree<Entry> subtree = b.getTree().getSubTree(from);
-		b.getTree().addSubTree(subtree, to);
+		TreeStructure<Entry> subtree = b.getTree().getSubTree(from);
+		b.getTree().addSubTree(to, subtree);
 		return new MoveUndoAction(b, from, to, parent);
 	}
 	

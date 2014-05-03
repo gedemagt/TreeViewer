@@ -9,7 +9,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import main.common.Entry;
-import main.tree.MyTree;
+import main.tree.GauravTree;
+import main.tree.TreeStructure;
 import main.undo.TreeActions;
 import main.undo.UndoRedoManager;
 
@@ -73,7 +74,7 @@ public class DnDListener extends MouseAdapter {
 		b.repaint();
 	}
 	
-	private MyTree getTree() {
+	private TreeStructure<Entry> getTree() {
 		return b.getTree();
 	}
 	

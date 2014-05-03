@@ -7,27 +7,25 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import main.tree.MyTree;
-
-import org.abego.treelayout.TreeForTreeLayout;
+import main.tree.GauravTree;
+import main.tree.TreeStructure;
 
 public class SaveLoad {
 
-	public MyTree load(File f) throws IOException {
+	public TreeStructure<Entry> load(File f) throws IOException {
 
 		FileReader r = new FileReader(f);
 		BufferedReader reader = new BufferedReader(r);
 		String line = reader.readLine();
 
 		Entry current = formatLine(line);
-		MyTree tree = new MyTree(current);
+		GauravTree tree = new GauravTree(current);
 
 		int indents = 0;
 		line = reader.readLine();
 
 		while(line != null) {
 			int new_indents = line.indexOf(Constants.left_border, 0);
-
 			if(new_indents < indents) {
 				Entry e = formatLine(line);
 				Entry grandparent = tree.getParent(tree.getParent(current));
@@ -46,7 +44,7 @@ public class SaveLoad {
 			}
 			indents = new_indents;
 
-			line =reader.readLine();
+			line = reader.readLine();
 		}
 		reader.close();
 		return tree;
@@ -63,14 +61,14 @@ public class SaveLoad {
 		return new Entry(rootText[0], rootText[1].replace(Constants.newLine, "\n"));
 	}
 
-	public void save(TreeForTreeLayout<Entry> tree, File f) throws IOException {
+	public void save(TreeStructure<Entry> tree, File f) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-		writeChildren(tree, writer, tree.getRoot(),"");
+		writeChildren(tree, writer, tree.root(),"");
 		writer.close();
 
 	}
 
-	private void writeChildren(TreeForTreeLayout<Entry> tree, BufferedWriter writer, Entry parent, String suffix) throws IOException {
+	private void writeChildren(TreeStructure<Entry> tree, BufferedWriter writer, Entry parent, String suffix) throws IOException {
 		writer.write(suffix + formatEntry(parent) + "\n");
 		if(!tree.isLeaf(parent)) {
 			for(Entry e : tree.getChildren(parent)) {
