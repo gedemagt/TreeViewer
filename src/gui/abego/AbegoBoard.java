@@ -123,6 +123,8 @@ public class AbegoBoard extends JLayeredPane implements Board{
 		abegoTree.setTree(tree);
 		treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
 		setPreferredSize(new Dimension((int) treeLayout.getBounds().getWidth(), (int) treeLayout.getBounds().getHeight()));
+		revalidate();
+		repaint();
 	}
 
 	private void registerPopupMenu() {

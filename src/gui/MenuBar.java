@@ -1,6 +1,7 @@
 package gui;
 
 import gui.abego.AbegoBoard;
+import gui.abego.TreeFactory;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
@@ -24,7 +26,8 @@ import main.undo.UndoRedoManager;
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
 
-	private JMenuItem menu_load,menu_save_as, undo, redo;
+	private JMenuItem menu_load, menu_save_as, menu_save, undo, redo, new_menu;
+	private JMenu file, edit;
 	private AbegoBoard panel;
 	private SaveLoad sl;
 
@@ -32,13 +35,29 @@ public class MenuBar extends JMenuBar {
 		this.panel = panel;
 		sl = new SaveLoad();
 		menu_save_as = new JMenuItem("Save As");
-		menu_load = new JMenuItem("Load");
+		menu_save = new JMenuItem("Save");
+		menu_load = new JMenuItem("Open");
+		new_menu = new JMenuItem("New");
+		
 		undo = new JMenuItem("Undo");
 		redo = new JMenuItem("Redo");
-		add(menu_save_as);
-		add(menu_load);
-		add(undo);
-		add(redo);
+		
+		
+		file = new JMenu("File");
+		edit = new JMenu("Edit");
+		
+		file.add(new_menu);
+		file.addSeparator();
+		file.add(menu_load);
+		file.add(menu_save);
+		file.add(menu_save_as);
+		
+		
+		edit.add(undo);
+		edit.add(redo);
+		
+		add(file);
+		add(edit);
 
 		menu_save_as.addActionListener(new ActionListener() {
 
@@ -46,6 +65,14 @@ public class MenuBar extends JMenuBar {
 			public void actionPerformed(ActionEvent arg0) {
 				saveAs();
 
+			}
+		});
+		menu_save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(currentFile != null) save(currentFile);
+				else saveAs();
 			}
 		});
 
@@ -76,18 +103,21 @@ public class MenuBar extends JMenuBar {
 			}
 		});
 
+		new_menu.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				(MenuBar.this.panel).setTree(TreeFactory.get());
+				currentFile = null;
+			}
+		});
 
 
-
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK),
-				"undo");
-		getActionMap().put("undo",
-				UndoRedoManager.getUndoAction());
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK), "undo");
+		getActionMap().put("undo", UndoRedoManager.getUndoAction());
 		
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK),
-				"redo");
-		getActionMap().put("redo",
-				UndoRedoManager.getRedoAction());
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK), "redo");
+		getActionMap().put("redo", UndoRedoManager.getRedoAction());
 
 	}
 
@@ -103,10 +133,24 @@ public class MenuBar extends JMenuBar {
 				panel.setTree(tree);
 				panel.repaint();
 				panel.revalidate();
+				currentFile = file;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
+		}
+	}
+	
+	private File currentFile;
+	
+	private void save(File file) {
+		if(file == null) saveAs();
+		String path = file.getAbsolutePath();
+		if(!file.getAbsolutePath().endsWith(Constants.suffix)) path += Constants.suffix;
+		try{
+			sl.save(panel.getTree(), new File(path));
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -115,21 +159,13 @@ public class MenuBar extends JMenuBar {
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Tree files", Constants.suffix.replace(".", ""));
 		JFileChooser fc = new JFileChooser();
 		fc.setFileFilter(filter);
+		if(currentFile != null) fc.setSelectedFile(currentFile);
 		int returnVal = fc.showSaveDialog(panel);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
-			String path = file.getAbsolutePath();
-			if(!file.getAbsolutePath().endsWith(Constants.suffix)) path += Constants.suffix;
-			try{
-				sl.save(panel.getTree(), new File(path));
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-
+			save(file);
+			currentFile = file;
 		}
-
-
-
 	}
 
 }

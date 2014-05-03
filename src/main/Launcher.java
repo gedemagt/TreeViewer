@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Dimension;
 import java.io.IOException;
 
 import gui.DnDListener;
@@ -29,6 +30,7 @@ public class Launcher {
 		JScrollPane p = new JScrollPane(panel);
 		
 		main_frame.add(new JScrollPane(p));
+		main_frame.setPreferredSize(new Dimension(860,600));
 		main_frame.setJMenuBar(new MenuBar(panel));
 		
 		main_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
