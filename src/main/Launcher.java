@@ -21,7 +21,6 @@ public class Launcher {
 	public static void main(String[] args) throws ParserConfigurationException, TransformerException, SAXException, IOException {
 		
 		JFrame main_frame = new JFrame();
-		
 
 		GauravTree tree = TreeFactory.get();
 		BoardImpl panel = new BoardImpl(tree);

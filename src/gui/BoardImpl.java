@@ -101,8 +101,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 	@Override
 	public void setTree(TreeStructure<Entry> tree) {
 		this.tree = tree;
-		p.revalidate();
-		repaint();
+		updateTree();
 	}
 
 	private void registerPopupMenu() {
@@ -122,7 +121,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 				if(new_e != null) i = showEditPopup(new_e, 0);
 				if(i == JOptionPane.OK_OPTION) {
 					UndoRedoManager.addEdit(TreeActions.add(BoardImpl.this, e, new_e));
-					p.revalidate();
+					updateTree();
 					repaint();
 				}
 			}
@@ -150,7 +149,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 				Entry e = getEntryAt(popup_x, popup_y);
 				if(e == null) return;
 				UndoRedoManager.addEdit(TreeActions.delete(BoardImpl.this, e));
-				p.revalidate();
+				updateTree();
 				repaint();
 			}
 		});
@@ -193,8 +192,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 					Entry entry = getEntryAt(e.getX(), e.getY());
 					if(entry == null) return;
 					entry.setShowDetails(!entry.isShowDetails());
-					p.revalidate();
-					repaint();
+					updateTree();
 				}
 
 			}
