@@ -3,9 +3,9 @@ package main;
 import java.awt.Dimension;
 import java.io.IOException;
 
+import gui.BoardImpl;
 import gui.DnDListener;
 import gui.MenuBar;
-import gui.abego.AbegoBoard;
 import gui.abego.TreeFactory;
 
 import javax.swing.JFrame;
@@ -24,7 +24,7 @@ public class Launcher {
 		
 
 		GauravTree tree = TreeFactory.get();
-		AbegoBoard panel = new AbegoBoard(tree);
+		BoardImpl panel = new BoardImpl(tree);
 		panel.registerListener(new DnDListener(panel));
 		
 		JScrollPane p = new JScrollPane(panel);

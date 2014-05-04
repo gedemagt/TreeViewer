@@ -25,6 +25,8 @@ public interface Board {
 	
 	public Painter getPainter();
 	
+	public void setPainter(Painter p);
+	
 	public void repaint();
 	
 }

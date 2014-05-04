@@ -1,6 +1,5 @@
 package gui;
 
-import gui.abego.AbegoBoard;
 import gui.abego.TreeFactory;
 
 import java.awt.event.ActionEvent;
@@ -28,10 +27,10 @@ public class MenuBar extends JMenuBar {
 
 	private JMenuItem menu_load, menu_save_as, menu_save, undo, redo, new_menu;
 	private JMenu file, edit;
-	private AbegoBoard panel;
+	private BoardImpl panel;
 	private SaveLoad sl;
 
-	public MenuBar(AbegoBoard panel) {
+	public MenuBar(BoardImpl panel) {
 		this.panel = panel;
 		sl = new SaveLoad();
 		menu_save_as = new JMenuItem("Save As");
