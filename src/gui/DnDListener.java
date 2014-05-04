@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import main.common.Entry;
-import main.tree.GauravTree;
 import main.tree.TreeStructure;
 import main.undo.TreeActions;
 import main.undo.UndoRedoManager;

@@ -1,8 +1,9 @@
-package main.tree;
+package gui.abego;
 
 import java.util.List;
 
 import main.common.Entry;
+import main.tree.TreeStructure;
 
 import org.abego.treelayout.util.AbstractTreeForTreeLayout;
 

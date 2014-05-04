@@ -13,7 +13,7 @@ import java.util.List;
 
 import main.common.Entry;
 
-public class DefaultPainter implements Painter{
+public class AbegoPainter implements Painter{
 
 	private final static int ARC_SIZE = 10;
 	private final static Color BOX_COLOR = Color.WHITE;
@@ -25,7 +25,7 @@ public class DefaultPainter implements Painter{
 	private AbegoBoard b;
 	private List<Entry> highlights;
 	
-	public DefaultPainter(AbegoBoard b) {
+	public AbegoPainter(AbegoBoard b) {
 		this.b = b;
 		highlights = new ArrayList<Entry>();
 	}

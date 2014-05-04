@@ -1,7 +1,7 @@
 package gui.abego;
 
 import gui.Board;
-import gui.painter.DefaultPainter;
+import gui.painter.AbegoPainter;
 import gui.painter.Painter;
 
 import java.awt.Dimension;
@@ -33,7 +33,6 @@ import main.tree.GauravTree;
 import main.tree.TreeStructure;
 import main.undo.TreeActions;
 import main.undo.UndoRedoManager;
-import main.tree.AbegoTree;
 
 @SuppressWarnings("serial")
 public class AbegoBoard extends JLayeredPane implements Board{
@@ -69,7 +68,7 @@ public class AbegoBoard extends JLayeredPane implements Board{
 
 		((EntryNodeExtentProvider) treeLayout.getNodeExtentProvider()).setFontMetric(getFontMetrics(glassPane.getFont()));
 
-		p = new DefaultPainter(this);
+		p = new AbegoPainter(this);
 
 		Dimension size = treeLayout.getBounds().getBounds().getSize();
 		setPreferredSize(size);
