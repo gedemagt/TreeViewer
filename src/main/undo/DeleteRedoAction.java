@@ -24,6 +24,7 @@ public class DeleteRedoAction extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		b.getTree().addSubTree(parent, subtree);
+		b.revalidate();
 	}
 	
 	@Override
