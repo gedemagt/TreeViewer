@@ -22,8 +22,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.OverlayLayout;
 
-import org.abego.treelayout.TreeLayout;
-
 import main.common.Entry;
 import main.tree.GauravTree;
 import main.tree.TreeStructure;
@@ -37,12 +35,6 @@ public class BoardImpl extends JLayeredPane implements Board{
 	private JPanel glassPane;
 
 
-	/**
-	 * Specifies the tree to be displayed by passing in a {@link TreeLayout} for
-	 * that tree.
-	 * 
-	 * @param treeLayout
-	 */
 	public BoardImpl(GauravTree tree) {
 		this.tree = tree;
 
@@ -56,52 +48,21 @@ public class BoardImpl extends JLayeredPane implements Board{
 		Dimension size = p.getSize();
 		setPreferredSize(size);
 		registerPopupMenu();
-
-		UndoRedoManager.registerListener(new Runnable() {
-
-			@Override
-			public void run() {
-				updateTree();
-
-			}
-		});
+		RightClickPopUpListener l = new RightClickPopUpListener(this);
+		addMouseListener(l);
 	}
 
-	// -------------------------------------------------------------------
-	// painting
-
-
-	private void paintEdges(Graphics g, Entry parent) {
-		if (!parent.iscollapsed()) {
-			p.paintChildEdges(g, parent);
-			for (Entry child : getTree().getChildren(parent)) {
-				paintEdges(g, child);
-			}
-		}
-	}
-
-	private void paintBox(Graphics g, Entry e) {
-		p.paintEntry(g, e);
-		if(!e.iscollapsed()) {
-			for (Entry child : tree.getChildren(e)){
-				paintBox(g, child);
-			}
-		}
-	}
 
 	private Painter p;
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-		paintEdges(g, getTree().root());
-		paintBox(g, getTree().root());
-
+		p.paintTree(g);
 	}
 
 	@Override
 	public void setTree(TreeStructure<Entry> tree) {
 		this.tree = tree;
-		updateTree();
 	}
 
 	private void registerPopupMenu() {
@@ -121,8 +82,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 				if(new_e != null) i = showEditPopup(new_e, 0);
 				if(i == JOptionPane.OK_OPTION) {
 					UndoRedoManager.addEdit(TreeActions.add(BoardImpl.this, e, new_e));
-					updateTree();
-					repaint();
+					revalidate();
 				}
 			}
 		});
@@ -136,7 +96,6 @@ public class BoardImpl extends JLayeredPane implements Board{
 				if(e == null) return;
 				showEditPopup(e, 1);
 
-
 				repaint();
 			}
 		});
@@ -149,8 +108,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 				Entry e = getEntryAt(popup_x, popup_y);
 				if(e == null) return;
 				UndoRedoManager.addEdit(TreeActions.delete(BoardImpl.this, e));
-				updateTree();
-				repaint();
+				revalidate();
 			}
 		});
 		popup.add(delete);
@@ -163,7 +121,7 @@ public class BoardImpl extends JLayeredPane implements Board{
 
 				Entry entry = getEntryAt(popup_x, popup_y);
 				if(entry != null) entry.collapsed(false);
-				repaint();
+				revalidate();
 
 			}
 		});
@@ -176,12 +134,12 @@ public class BoardImpl extends JLayeredPane implements Board{
 			public void actionPerformed(ActionEvent arg0) {
 				Entry entry = getEntryAt(popup_x, popup_y);
 				if(entry != null && !tree.isLeaf(entry)) entry.collapsed(true);
-				repaint();
+				revalidate();
 			}
 		});
 		popup.add(collapse);
 		
-		setComponentPopupMenu(popup);
+//		setComponentPopupMenu(popup);
 		addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -192,7 +150,6 @@ public class BoardImpl extends JLayeredPane implements Board{
 					Entry entry = getEntryAt(e.getX(), e.getY());
 					if(entry == null) return;
 					entry.setShowDetails(!entry.isShowDetails());
-					updateTree();
 				}
 
 			}
@@ -239,14 +196,6 @@ public class BoardImpl extends JLayeredPane implements Board{
 	}
 
 	@Override
-	public void updateTree() {
-		p.revalidate();
-		setPreferredSize(p.getSize());
-		revalidate();
-		repaint();
-	}
-
-	@Override
 	public void registerListener(MouseAdapter m) {
 		addMouseListener(m);
 		addMouseMotionListener(m);
@@ -273,7 +222,14 @@ public class BoardImpl extends JLayeredPane implements Board{
 	@Override
 	public void setPainter(Painter p) {
 		this.p = p;
+		revalidate();
+	}
+	
+	@Override
+	public void revalidate() {
 		p.revalidate();
+		setPreferredSize(p.getSize());
+		super.revalidate();
 		repaint();
 	}
 	

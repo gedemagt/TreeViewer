@@ -8,9 +8,7 @@ import main.common.Entry;
 
 public interface Painter {
 
-	public void paintEntry(Graphics g, Entry e);
-	
-	public void paintChildEdges(Graphics g, Entry e);
+	public void paintTree(Graphics g);
 	
 	public void highlight(Entry e, boolean shouldHighligh);
 	

@@ -1,5 +1,6 @@
 package gui.abego;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import main.common.Entry;
@@ -9,7 +10,8 @@ import org.abego.treelayout.util.AbstractTreeForTreeLayout;
 
 public class AbegoTree extends AbstractTreeForTreeLayout<Entry> {
 
-	TreeStructure<Entry> tree;
+	private TreeStructure<Entry> tree;
+	private List<Entry> empty = new ArrayList<Entry>();
 	
 	public AbegoTree(TreeStructure<Entry> tree) {
 		super(tree.root());
@@ -23,6 +25,7 @@ public class AbegoTree extends AbstractTreeForTreeLayout<Entry> {
 
 	@Override
 	public List<Entry> getChildrenList(Entry arg0) {
+		if(arg0.iscollapsed()) return empty;
 		return tree.getChildren(arg0);
 	}
 

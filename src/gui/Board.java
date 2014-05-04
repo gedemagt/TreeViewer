@@ -17,8 +17,6 @@ public interface Board {
 	
 	public TreeStructure<Entry> getTree();
 	
-	public void updateTree();
-	
 	public void registerListener(MouseAdapter m);
 	
 	public void setGlassPane(JPanel jp);
@@ -28,5 +26,7 @@ public interface Board {
 	public void setPainter(Painter p);
 	
 	public void repaint();
+	
+	public void revalidate();
 	
 }

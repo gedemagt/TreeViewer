@@ -20,6 +20,7 @@ import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 
 import main.common.Entry;
+import main.tree.TreeStructure;
 
 public class AbegoPainter implements Painter{
 
@@ -33,7 +34,10 @@ public class AbegoPainter implements Painter{
 	private TreeLayout<Entry> treeLayout;
 	private List<Entry> highlights;
 	private AbegoTree abegoTree;
-	
+
+	private int x_extra = 0;
+	private int y_extra = 0;
+
 	public AbegoPainter(Board b) {
 		this.b = b;
 		abegoTree = new AbegoTree(b.getTree());
@@ -45,31 +49,32 @@ public class AbegoPainter implements Painter{
 		treeLayout = new TreeLayout<Entry>(abegoTree, nodeExtentProvider, config);
 	}
 
-	@Override
-	public void paintEntry(Graphics g, Entry e) {
+	private void paintEntry(Graphics g, Entry e) {
 		Graphics2D g2 = (Graphics2D) g;
 		// draw the box in the background
 		g.setColor(BOX_COLOR);
-		Rectangle2D.Double box = getBoundsOfNode(e);
-
-		g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-				(int) box.height - 1, ARC_SIZE, ARC_SIZE);
 		
+		Rectangle2D.Double box = getBoundsOfNode(e);
+		int box_x = (int) box.x + x_extra;
+		int box_y = (int) box.y + y_extra;
+		g.fillRoundRect(box_x, box_y, (int) box.width - 1,
+				(int) box.height - 1, ARC_SIZE, ARC_SIZE);
+
 		if(e.iscollapsed()) g2.setStroke(new BasicStroke(3));
 		else g2.setStroke(new BasicStroke(1));
-		
+
 		if(highlights.contains(e)) g.setColor(HIGHLIGHTED_BORDER_COLOR);
 		else g.setColor(BORDER_COLOR);
-		
-		g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
+
+		g.drawRoundRect(box_x, box_y, (int) box.width - 1,
 				(int) box.height - 1, ARC_SIZE, ARC_SIZE);
 
 		// draw the text on top of the box (possibly multiple lines)
 		g.setColor(TEXT_COLOR);
 		String[] lines = e.getDetails().split("\n");
 		FontMetrics m = g.getFontMetrics(g.getFont());
-		int x = (int) box.x + ARC_SIZE / 2;
-		int y = (int) box.y + m.getAscent() + m.getLeading() + 1;
+		int x = box_x + ARC_SIZE / 2;
+		int y = box_y + m.getAscent() + m.getLeading() + 1;
 
 		// Draw title
 		g.drawString(e.getTitle(), x, y);
@@ -89,19 +94,18 @@ public class AbegoPainter implements Painter{
 
 	}
 
-	@Override
-	public void paintChildEdges(Graphics g, Entry parent) {
-			Rectangle2D.Double b1 = getBoundsOfNode(parent);
-			double x1 = b1.getCenterX();
-			double y1 = b1.getCenterY();
-			for (Entry child : b.getTree().getChildren(parent)) {
+	private void paintChildEdges(Graphics g, Entry parent) {
+		Rectangle2D.Double b1 = getBoundsOfNode(parent);
+		double x1 = b1.getCenterX();
+		double y1 = b1.getCenterY();
+		for (Entry child : b.getTree().getChildren(parent)) {
 
-				Rectangle2D.Double b2 = getBoundsOfNode(child);
-				g.drawLine((int) x1, (int) y1, (int) b2.getCenterX(),
-						(int) b2.getCenterY());
+			Rectangle2D.Double b2 = getBoundsOfNode(child);
+			g.drawLine((int) x1 + x_extra, (int) y1 + y_extra, (int) b2.getCenterX() + x_extra,
+					(int) b2.getCenterY() + y_extra);
 
-			}
-		
+		}
+
 
 	}
 
@@ -130,6 +134,10 @@ public class AbegoPainter implements Painter{
 	public void revalidate() {
 		abegoTree.setTree(b.getTree());
 		treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+		Entry firstChild = treeLayout.getTree().getFirstChild(treeLayout.getTree().getRoot());
+		Rectangle2D.Double first = treeLayout.getNodeBounds().get(firstChild);
+//		x_extra = - (int) first.x;
+		y_extra = - (int) first.y;
 	}
 
 	@Override
@@ -143,11 +151,42 @@ public class AbegoPainter implements Painter{
 
 			Rectangle2D.Double r = treeLayout.getNodeBounds().get(e);
 
-			if(r.contains((double) x, (double) y)) {
+			if(r.contains((double) x - x_extra, (double) y - y_extra)) {
 				return e;
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void paintTree(Graphics g) {
+		abegoTree.setTree(b.getTree());
+		treeLayout = new TreeLayout<Entry>(abegoTree, treeLayout.getNodeExtentProvider(), treeLayout.getConfiguration());
+
+		for (Entry child : b.getTree().getChildren(b.getTree().root())) {
+			paintEdges(g, b.getTree(), child);
+			paintBox(g, b.getTree(), child);
+		}
+	}
+
+	private void paintEdges(Graphics g, TreeStructure<Entry> tree, Entry e) {
+		if(!e.iscollapsed()) {
+			paintChildEdges(g, e);
+
+			for (Entry child : abegoTree.getChildren(e)) {
+				paintEdges(g, tree, child);
+
+			}
+		}
+	}
+
+	private void paintBox(Graphics g, TreeStructure<Entry> tree, Entry e) {
+		paintEntry(g, e);
+		if(!e.iscollapsed()) {
+			for (Entry child : abegoTree.getChildren(e)) {
+				paintBox(g, tree, child);
+			}
+		}
 	}
 
 }

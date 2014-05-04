@@ -61,10 +61,8 @@ public class DnDListener extends MouseAdapter {
 		int y = arg0.getY();
 		Entry e = b.getEntryAt(x, y);
 		if(acceptEndEntry(e)) {
-			
 			UndoRedoManager.addEdit(TreeActions.move(b, current, e));
-			
-			b.updateTree();
+			b.repaint();
 		}
 		
 		p.highlightAll(null, false);
